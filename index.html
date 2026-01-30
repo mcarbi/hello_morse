@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Morse Trainer</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 20px; }
+    h1 { font-size: 36px; }
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, auto); /* let columns size to content */
+  column-gap: 180px; /* smaller horizontal spacing between columns */
+  row-gap: 20px;    /* vertical spacing between rows */
+  justify-content: center; /* centers the entire grid in the page */
+}
+    .unit { display: flex; flex-direction: column; align-items: center; }
+    .unit-button { font-size: 18px; padding: 10px 20px; cursor: pointer; }
+    .unit-text { font-size: 14px; margin-top: 5px; }
+    #letter-buttons, #call-letters { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .letter-button, .call-letter { font-size: 16px; padding: 8px 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; border: 1px solid #333; border-radius: 5px; min-width: 60px; background-color: #f0f0f0; }
+    .call-letter { flex-direction: row; justify-content: center; }
+    .letter-button span, .call-letter span { font-size: 14px; margin-left: 5px; }
+    #call-input, #guess-input, #call-cw-input { font-size: 16px; padding: 5px; width: 200px; text-align: center; margin-left: 10px; }
+    .feedback { font-size: 16px; margin-top: 10px; }
+    #cw-practice { margin-top:20px; display:flex; flex-direction:column; align-items:center; }
+    #cw-letter-output { font-size: 20px; border: 1px solid #333; padding: 10px; min-width: 150px; min-height: 40px; text-align: center; margin-top: 10px; }
+    #cw-target-letter { font-size: 24px; margin-top: 10px; }
+    #scoreboard {
+  margin-top: 20px;
+  font-size: 16px;
+  display: flex;             /* use flexbox */
+  justify-content: center;   /* center horizontally */
+  gap: 20px;                 /* space between the items */
+}
+
+    footer { margin-top: 40px; font-size: 14px; font-style: italic; }
+    #top-image { max-width: 400px; margin-top: 20px; }
+#top-image {
+  max-width: 1100px;          /* controls horizontal spread */
+  margin: 30px auto 40px;     /* centers the whole chart */
+  padding: 0 20px;
+}
+
+#letters-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr); /* 10 fixed columns */
+  gap: 14px;
+  justify-items: center;
+}
+
+/* Push U–Z right so U aligns under M */
+#letters-grid .letter-button:nth-child(21) {
+  grid-column-start: 3;
+}
+
+
+#numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 14px;
+  justify-items: center;
+  margin-top: 25px;
+}
+
+
+#letters-grid .letter-button,
+#numbers-grid .letter-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  min-width: 70px;
+  min-height: 70px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+#letters-grid .letter-button:hover,
+#numbers-grid .letter-button:hover {
+  background-color: #e0e0ff;
+  transform: translateY(-2px);
+}
+
+.letter-button strong {
+  font-size: 18px;
+}
+
+.letter-button span {
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+#chart-divider {
+  height: 4px;
+  background: black;
+  margin: 30px auto;
+  width: 80%;
+  border-radius: 2px;
+}
+
+#chart-spacer {
+  height: 30px;
+  background: white;
+  margin: 20px 0;
+}
+
+
+  </style>
+</head>
+<body>
+
+<h1>Hello Morse</h1>
+<p>Welcome! This page will play "HI" in CW when it loads.</p>
+
+<div id="top-image" style="margin-top:20px;">
+
+  <!-- Letters -->
+  <div id="letters-grid"></div>
+
+  <!-- Black space (no line) -->
+  <div id="chart-spacer"></div>
+
+  <!-- Numbers -->
+  <div id="numbers-grid" style="margin-top:15px;"></div>
+
+  <!-- Real line AFTER numbers -->
+  <div id="chart-divider"></div>
+
+</div>
+
+
+
+
+<div class="grid-container">
+  <div class="unit"><button class="unit-button" data-unit="1">Unit 1</button><div class="unit-text">Learning E-T-N-A</div></div>
+  <div class="unit"><button class="unit-button" data-unit="2">Unit 2</button><div class="unit-text">Learning I-M-K-R</div></div>
+  <div class="unit"><button class="unit-button" data-unit="3">Unit 3</button><div class="unit-text">Learning D-G-U-W</div></div>
+  <div class="unit"><button class="unit-button" data-unit="4">Unit 4</button><div class="unit-text">Learning O-S-C-H</div></div>
+  <div class="unit"><button class="unit-button" data-unit="5">Unit 5</button><div class="unit-text">Learning L-F-J</div></div>
+  <div class="unit"><button class="unit-button" data-unit="6">Unit 6</button><div class="unit-text">Learning Q-Y-P-X</div></div>
+  <div class="unit"><button class="unit-button" data-unit="7">Unit 7</button><div class="unit-text">Learning B-Z-V</div></div>
+  <div class="unit"><button class="unit-button" data-unit="8">Unit 8</button><div class="unit-text">Numbers 1-2-3-4-5</div></div>
+  <div class="unit"><button class="unit-button" data-unit="9">Unit 9</button><div class="unit-text">Numbers 6-7-8-9-0</div></div>
+</div>
+
+<div id="callSignUnit" class="unit" style="margin-top:30px;">
+  <button class="unit-button" data-unit="10">Unit 10</button>
+  <div class="unit-text">Practice your call sign</div>
+</div>
+
+<div id="scoreboard">
+  <span>Guess Score: <span id="guess-score">0</span></span> |
+  <span>CW Score: <span id="cw-score">0</span></span>
+</div>
+
+<div id="letter-buttons"></div>
+
+<div id="practice-area" style="display:none; flex-direction:column; align-items:center; margin-top:20px;">
+  <button id="guess-letter-btn">Guess the Letter</button>
+  <input type="text" id="guess-input" placeholder="Type your answer" maxlength="1">
+  <div id="guess-feedback" class="feedback"></div>
+
+  <div id="cw-practice">
+    <div id="cw-target-letter"></div>
+    <div id="cw-letter-output"></div>
+    <div id="cw-feedback" class="feedback"></div>
+    <p>Press <strong>L</strong> for dot (.) and <strong>P</strong> for dash (-)</p>
+  </div>
+</div>
+
+<div id="call-sign-area" style="display:none; flex-direction:column; align-items:center; margin-top:20px;">
+  <input type="text" id="call-input" placeholder="Enter your call sign (e.g. KR4JEX)" maxlength="10">
+  <div id="call-letters" style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:10px;"></div>
+  <button id="play-call" style="margin-top:10px;">Play Full Morse</button>
+  <input type="text" id="call-cw-input" placeholder="Enter CW (L/P)" style="width:200px; margin-top:10px;">
+  <button id="check-call-cw" style="margin-top:10px;">Check CW</button>
+  <div id="call-cw-feedback" class="feedback"></div>
+</div>
+
+<footer> &copy; 2026 Marina F. Carbi (KR4JEX). All rights reserved. </footer>
+
+<script>
+// --- Morse map ---
+const MORSE_NATO = {
+  A:{morse:".-",nato:"Alpha"},B:{morse:"-...",nato:"Bravo"},C:{morse:"-.-.",nato:"Charlie"},D:{morse:"-..",nato:"Delta"},
+  E:{morse:".",nato:"Echo"},F:{morse:"..-.",nato:"Foxtrot"},G:{morse:"--.",nato:"Golf"},H:{morse:"....",nato:"Hotel"},
+  I:{morse:"..",nato:"India"},J:{morse:".---",nato:"Juliett"},K:{morse:"-.-",nato:"Kilo"},L:{morse:".-..",nato:"Lima"},
+  M:{morse:"--",nato:"Mike"},N:{morse:"-.",nato:"November"},O:{morse:"---",nato:"Oscar"},P:{morse:".--.",nato:"Papa"},
+  Q:{morse:"--.-",nato:"Quebec"},R:{morse:".-.",nato:"Romeo"},S:{morse:"...",nato:"Sierra"},T:{morse:"-",nato:"Tango"},
+  U:{morse:"..-",nato:"Uniform"},V:{morse:"...-",nato:"Victor"},W:{morse:".--",nato:"Whiskey"},X:{morse:"-..-",nato:"X-ray"},
+  Y:{morse:"-.--",nato:"Yankee"},Z:{morse:"--..",nato:"Zulu"},
+  "1":{morse:".----",nato:"One"},"2":{morse:"..---",nato:"Two"},"3":{morse:"...--",nato:"Three"},"4":{morse:"....-",nato:"Four"},
+  "5":{morse:".....",nato:"Five"},"6":{morse:"-....",nato:"Six"},"7":{morse:"--...",nato:"Seven"},"8":{morse:"---..",nato:"Eight"},
+  "9":{morse:"----.",nato:"Nine"},"0":{morse:"-----",nato:"Zero"}
+};
+
+// --- Audio ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playTone(duration){const osc=audioCtx.createOscillator();osc.type='sine';osc.frequency.setValueAtTime(600,audioCtx.currentTime);osc.connect(audioCtx.destination);osc.start();osc.stop(audioCtx.currentTime+duration);}
+function playMorse(morse, delayMultiplier=0){let delay=0;for(let symbol of morse){setTimeout(()=>{if(symbol===".")playTone(0.1);if(symbol==="-")playTone(0.3);},(delay+delayMultiplier)*400);delay++;}return morse.length+1;}
+
+
+// Play HI on load
+window.onload = ()=>{
+  // Play HI on load
+  const hLen = playMorse("....");
+  setTimeout(()=>playMorse(".."), hLen*400+200);
+
+  // --- Interactive alphabet chart ---
+  const lettersGrid = document.getElementById("letters-grid");
+  const numbersGrid = document.getElementById("numbers-grid");
+
+  // Letters A–Z
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(l => {
+    if (MORSE_NATO[l]) {
+      const btn = document.createElement("button");
+      btn.className = "letter-button";
+      btn.innerHTML = `
+        <strong>${l}</strong>
+        <span>${MORSE_NATO[l].morse}</span>
+        <span>${MORSE_NATO[l].nato}</span>
+      `;
+      btn.onclick = () => playMorse(MORSE_NATO[l].morse);
+      lettersGrid.appendChild(btn);
+    }
+  });
+
+  // Numbers 0–9
+  "0123456789".split("").forEach(l => {
+    if (MORSE_NATO[l]) {
+      const btn = document.createElement("button");
+      btn.className = "letter-button";
+      btn.innerHTML = `
+        <strong>${l}</strong>
+        <span>${MORSE_NATO[l].morse}</span>
+        <span>${MORSE_NATO[l].nato}</span>
+      `;
+      btn.onclick = () => playMorse(MORSE_NATO[l].morse);
+      numbersGrid.appendChild(btn);
+    }
+  });
+};
+
+
+// --- Units ---
+const unitLettersMap = {
+  "1":["E","T","N","A"],"2":["I","M","K","R"],"3":["D","G","U","W"],
+  "4":["O","S","C","H"],"5":["L","F","J"],"6":["Q","Y","P","X"],
+  "7":["B","Z","V"],"8":["1","2","3","4","5"],"9":["6","7","8","9","0"]
+};
+
+let scores={}, currentUnit="", currentUnitLetters=[], cwTargetLetter="", cwBuffer=[], guessLetter="";
+for(let i=1;i<=10;i++){
+  scores[i] = {
+    cwCorrect: 0,
+    cwAttempts: 0,
+    guessCorrect: 0,
+    guessAttempts: 0
+  };
+}
+
+const letterContainer=document.getElementById("letter-buttons");
+const practiceArea=document.getElementById("practice-area");
+const cwOutput=document.getElementById("cw-letter-output");
+const cwFeedback=document.getElementById("cw-feedback");
+const cwTargetDiv=document.getElementById("cw-target-letter");
+const guessInput=document.getElementById("guess-input");
+const guessFeedback=document.getElementById("guess-feedback");
+const cwScoreSpan=document.getElementById("cw-score");
+const guessScoreSpan=document.getElementById("guess-score");
+const totalScoreSpan=document.querySelector("#scoreboard span:last-child");
+const callInput=document.getElementById("call-input");
+const callLettersDiv=document.getElementById("call-letters");
+const callCwInput=document.getElementById("call-cw-input");
+const callCwFeedback=document.getElementById("call-cw-feedback");
+const callOutput=document.getElementById("call-output");
+const cwPracticeDiv = document.getElementById("cw-practice");
+
+
+// --- Unit selection ---
+document.querySelectorAll(".unit-button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentUnit = btn.dataset.unit;
+
+    // Hide or show scoreboard
+    if (currentUnit === "10") {
+      document.getElementById("scoreboard").style.display = "none";
+    } else {
+      document.getElementById("scoreboard").style.display = "flex";
+    }
+
+    // Set letters for units 1-9
+    const map = {
+      "1": ["E","T","N","A"], "2": ["I","M","K","R"], "3": ["D","G","U","W"],
+      "4": ["O","S","C","H"], "5": ["L","F","J"], "6": ["Q","Y","P","X"],
+      "7": ["B","Z","V"], "8": ["1","2","3","4","5"], "9": ["6","7","8","9","0"]
+    };
+    currentUnitLetters = map[currentUnit] || [];
+    cwUnitLetters = [...currentUnitLetters];
+
+    // Populate letter buttons (units 1-9)
+    letterContainer.innerHTML = "";
+    currentUnitLetters.forEach(l => {
+      if(MORSE_NATO[l]){
+        const b = document.createElement("button");
+        b.className = "letter-button";
+        b.innerHTML = `<strong>${l}</strong><span>${MORSE_NATO[l].morse}</span><span>${MORSE_NATO[l].nato}</span>`;
+        b.onclick = () => playMorse(MORSE_NATO[l].morse);
+        letterContainer.appendChild(b);
+      }
+    });
+
+    if(currentUnit === "10"){
+      practiceArea.style.display = "none";
+      document.getElementById("call-sign-area").style.display = "flex";
+      // Reset call sign input
+      callInput.value = "";
+      callLettersDiv.innerHTML = "";
+    } else {
+      practiceArea.style.display = "flex";
+      document.getElementById("call-sign-area").style.display = "none";
+      cwPracticeDiv.style.display = "flex";
+      startCWLetter();
+    }
+
+    updateScoreDisplay();
+  });
+});
+
+
+// --- Update scores ---
+function updateScoreDisplay(){
+  if(currentUnit==="10") return; // hide for Unit 10
+
+  const s = scores[currentUnit];
+  cwScoreSpan.innerText = `${s.cwCorrect}/${s.cwAttempts}`;
+  guessScoreSpan.innerText = `${s.guessCorrect}/${s.guessAttempts}`;
+}
+
+// --- CW Practice for units 1-9 ---
+function startCWLetter(){
+  const idx=Math.floor(Math.random()*currentUnitLetters.length);
+  cwTargetLetter=currentUnitLetters[idx];
+  cwBuffer=[];
+  cwOutput.innerText="";
+  cwFeedback.innerText="";
+  cwTargetDiv.innerText=cwTargetLetter;
+}
+
+// L/P key input
+document.addEventListener("keydown", e=>{
+  if(currentUnit>=10) return; // Unit 10 handled separately
+  if(!cwTargetLetter) return;
+  const morse=MORSE_NATO[cwTargetLetter].morse;
+  if(e.key.toLowerCase()==="l"){cwBuffer.push("."); cwOutput.innerText=cwBuffer.join(""); playTone(0.1);}
+  if(e.key.toLowerCase()==="p"){cwBuffer.push("-"); cwOutput.innerText=cwBuffer.join(""); playTone(0.3);}
+if(cwBuffer.length===morse.length){
+  scores[currentUnit].cwAttempts++;
+  if(cwBuffer.join("")===morse){
+    cwFeedback.innerText=`Correct! It was ${cwTargetLetter}`;
+    scores[currentUnit].cwCorrect++;
+  } else {
+    cwFeedback.innerText=`Incorrect. It was ${cwTargetLetter}`;
+    playMorse(morse);
+  }
+  updateScoreDisplay();
+  setTimeout(startCWLetter,800);
+}
+});
+
+// --- Guess-the-letter ---
+document.getElementById("guess-letter-btn").addEventListener("click", ()=>{
+  const idx=Math.floor(Math.random()*currentUnitLetters.length);
+  guessLetter=currentUnitLetters[idx];
+  playMorse(MORSE_NATO[guessLetter].morse);
+  guessInput.value=""; guessInput.focus(); guessFeedback.innerText="";
+});
+guessInput.addEventListener("keydown", e=>{
+if(e.key==="Enter" && guessLetter){
+  scores[currentUnit].guessAttempts++;
+  const val = guessInput.value.toUpperCase();
+  if(val === guessLetter){
+    guessFeedback.innerText = `Correct! It was ${guessLetter}`;
+    scores[currentUnit].guessCorrect++;
+  } else {
+    guessFeedback.innerText = `Incorrect. It was ${guessLetter}`;
+    playMorse(MORSE_NATO[guessLetter].morse);
+  }
+  guessLetter = "";
+  updateScoreDisplay();
+}
+});
+
+// --- Unit 10 call sign horizontal letters ---
+callInput.addEventListener("input", ()=>{
+  callLettersDiv.innerHTML="";
+  callInput.value.toUpperCase().split("").forEach(l=>{
+    const div = document.createElement("div");
+    div.className = "call-letter";
+    div.innerHTML = `<strong>${l}</strong><span>${MORSE_NATO[l]?MORSE_NATO[l].morse:""}</span>`;
+    
+    // Play Morse when clicked
+    if(MORSE_NATO[l]){
+      div.style.cursor = "pointer";
+      div.onclick = () => playMorse(MORSE_NATO[l].morse);
+    }
+    
+    callLettersDiv.appendChild(div);
+  });
+});
+
+// --- Unit 10 CW check ---
+document.getElementById("check-call-cw").addEventListener("click", ()=>{
+  const entered = callCwInput.value.toUpperCase();
+  const expected = callInput.value.toUpperCase().split("").map(c => MORSE_NATO[c]?.morse).join("");
+  if(entered.replace(/[^LP]/g,"") === expected.replace(/\./g,"L").replace(/-/g,"P")){
+    callCwFeedback.innerText = "Correct!";
+  } else { 
+    callCwFeedback.innerText = "Incorrect"; 
+  }
+});
+
+// --- Play full call Morse (sound only, letters already displayed) ---
+document.getElementById("play-call").addEventListener("click", ()=>{
+  let totalDelay = 0;
+  callInput.value.toUpperCase().split("").forEach(c=>{
+    if(MORSE_NATO[c]){
+      playMorse(MORSE_NATO[c].morse, totalDelay);
+      totalDelay += MORSE_NATO[c].morse.length + 1;
+    }
+  });
+});
+
+
+</script>
+
+</body>
+</html>
